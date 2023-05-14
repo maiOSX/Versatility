@@ -1,0 +1,75 @@
+import os
+
+# File class to represent a shared file
+class SharedFile:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.shared_accounts = set()  # Set to store the shared account IDs
+
+    def share_with_account(self, account_id):
+        self.shared_accounts.add(account_id)
+
+    def unshare_with_account(self, account_id):
+        self.shared_accounts.discard(account_id)
+
+    def is_shared_with_account(self, account_id):
+        return account_id in self.shared_accounts
+
+
+# File sharing system
+class FileSharingSystem:
+    def __init__(self):
+        self.files = {}  # Dictionary to store shared files (file_path: SharedFile object)
+
+    def share_file_with_accounts(self, file_path, account_ids):
+        if not os.path.isfile(file_path):
+            print("File not found.")
+            return
+
+        if file_path in self.files:
+            shared_file = self.files[file_path]
+        else:
+            shared_file = SharedFile(file_path)
+            self.files[file_path] = shared_file
+
+        for account_id in account_ids:
+            shared_file.share_with_account(account_id)
+
+        print("File shared successfully.")
+
+    def unshare_file_with_accounts(self, file_path, account_ids):
+        if file_path not in self.files:
+            print("File not found.")
+            return
+
+        shared_file = self.files[file_path]
+
+        for account_id in account_ids:
+            shared_file.unshare_with_account(account_id)
+
+        print("File unshared successfully.")
+
+    def is_file_shared_with_account(self, file_path, account_id):
+        if file_path not in self.files:
+            return False
+
+        shared_file = self.files[file_path]
+        return shared_file.is_shared_with_account(account_id)
+
+
+# Usage example
+file_sharing_system = FileSharingSystem()
+
+# Sharing a file with two accounts
+file_sharing_system.share_file_with_accounts("/path/to/file.txt", ["account1", "account2"])
+
+# Checking if the file is shared with an account
+is_shared = file_sharing_system.is_file_shared_with_account("/path/to/file.txt", "account1")
+print(f"File shared with account1: {is_shared}")
+
+# Unsharing the file with an account
+file_sharing_system.unshare_file_with_accounts("/path/to/file.txt", ["account1"])
+
+# Checking if the file is shared with the account after unsharing
+is_shared = file_sharing_system.is_file_shared_with_account("/path/to/file.txt", "account1")
+print(f"File shared with account1: {is_shared}")
